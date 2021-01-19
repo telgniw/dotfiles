@@ -1,0 +1,14 @@
+Host hostname
+	HostName hostname.example.com
+	User me
+	IdentitiesOnly Yes
+	IdentityFile ~/.ssh/id_rsa
+	ForwardAgent yes
+
+Host host1 host2
+	HostName %h.example.com
+	User me
+
+Host multi-host*
+	HostName %h.example.com
+	User me
