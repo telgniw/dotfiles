@@ -25,3 +25,48 @@ fftweet() {
   ffmpeg -i $1 $VF -c:v libx264 $BR $FR $OUT
   set +x
 }
+
+ns-dl() {
+  set -x
+  wget http://192.168.0.1/data.json
+  jq .FileNames[] < data.json | xargs -I {} wget http://192.168.0.1/img/{}
+  rm -f data.json
+  set +x
+}
+
+yt-mp3() {
+  set -x
+  youtube-dl -x --audio-format=mp3 $1
+  set +x
+}
+
+beatoraja() {
+  set -x
+  local BEATORAJA_PATH="$HOME/Applications/beatoraja0.8.1"
+  local JAVA_PATH="$HOME/Library/Application Support/minecraft/runtime/jre-x64/jre.bundle/Contents/Home/bin"
+  local CMD=
+  if [[ $# -gt 0 ]] && [[ $1 == [a-z]* ]]; then
+    CMD=$1 && shift
+  fi
+  case $CMD in
+    '')
+      bash -c "cd '$BEATORAJA_PATH' && PATH='$JAVA_PATH:$PATH' java -jar beatoraja.jar"
+      ;;
+    add)
+      local I=
+      for I in "${@}"; do
+        if [[ $I == *.zip ]]; then
+          local TARGET="$BEATORAJA_PATH/ipfs/$(basename "${I%%.zip}")"
+          mkdir -p "$TARGET"
+          unzip "$I" -d "$TARGET"
+        else
+          mv "$I" "$BEATORAJA_PATH/ipfs"
+        fi
+      done
+      ;;
+    *)
+      echo Unknown command $0 $CMD
+      ;;
+  esac
+  set +x
+}
